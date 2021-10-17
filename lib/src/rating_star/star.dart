@@ -7,7 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import './half_clip.dart';
 
-typedef void RatingChangeCallback(double? rating);
+typedef RatingChangeCallback = void Function(double? rating);
 
 class SimpleStarRating extends StatefulWidget {
   final int starCount;
@@ -20,7 +20,7 @@ class SimpleStarRating extends StatefulWidget {
       nonFilledIcon; //this is needed only when having fullRatedIconData && halfRatedIconData
   final double spacing;
   final bool isReadOnly;
-  SimpleStarRating({
+  const SimpleStarRating({
     Key? key,
     this.starCount = 5,
     this.isReadOnly = false,
@@ -75,7 +75,7 @@ class _SimpleStarRatingState extends State<SimpleStarRating> {
   Widget buildStar(BuildContext context, int index) {
     Widget icon;
     if (index >= currentRating!) {
-      icon = widget.nonFilledIcon ?? _buildDefaultIcon(Color(0xffB0B0B0));
+      icon = widget.nonFilledIcon ?? _buildDefaultIcon(const Color(0xffB0B0B0));
     } else if (index >
             (currentRating! -
                     (widget.allowHalfRating ? halfStarThreshold : 1.0))
@@ -83,16 +83,17 @@ class _SimpleStarRatingState extends State<SimpleStarRating> {
         index < currentRating!) {
       icon = Stack(
         children: [
-          widget.nonFilledIcon ?? _buildDefaultIcon(Color(0xffB0B0B0)),
+          widget.nonFilledIcon ?? _buildDefaultIcon(const Color(0xffB0B0B0)),
           ClipPath(
-            child: widget.filledIcon ?? _buildDefaultIcon(Color(0xffFFBF1C)),
+            child:
+                widget.filledIcon ?? _buildDefaultIcon(const Color(0xffFFBF1C)),
             clipBehavior: Clip.hardEdge,
             clipper: HalfClipper(),
           ),
         ],
       );
     } else {
-      icon = widget.filledIcon ?? _buildDefaultIcon(Color(0xffFFBF1C));
+      icon = widget.filledIcon ?? _buildDefaultIcon(const Color(0xffFFBF1C));
     }
     final Widget star = widget.isReadOnly
         ? icon
@@ -174,7 +175,8 @@ class _SimpleStarRatingState extends State<SimpleStarRating> {
                       currentRating = newRating;
                     });
                     debounceTimer?.cancel();
-                    debounceTimer = Timer(Duration(milliseconds: 100), () {
+                    debounceTimer =
+                        Timer(const Duration(milliseconds: 100), () {
                       if (widget.onRated != null) {
                         currentRating = normalizeRating(newRating);
                         widget.onRated!(currentRating);
@@ -199,7 +201,6 @@ class _SimpleStarRatingState extends State<SimpleStarRating> {
                     newRating = 0.0;
                   }
                   newRating = normalizeRating(newRating);
-                  print("newrating is $newRating");
                   setState(() {
                     currentRating = newRating;
                   });
@@ -225,7 +226,7 @@ class _SimpleStarRatingState extends State<SimpleStarRating> {
                     currentRating = newRating;
                   });
                   debounceTimer?.cancel();
-                  debounceTimer = Timer(Duration(milliseconds: 100), () {
+                  debounceTimer = Timer(const Duration(milliseconds: 100), () {
                     if (widget.onRated != null) {
                       currentRating = normalizeRating(newRating);
                       widget.onRated!(currentRating);

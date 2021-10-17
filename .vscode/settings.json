@@ -1,3 +1,6 @@
 {
-    "rpc.enabled": false
+    "rpc.enabled": false,
+    "cSpell.words": [
+        "Schyler"
+    ]
 }

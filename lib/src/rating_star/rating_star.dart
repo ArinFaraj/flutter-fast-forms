@@ -78,26 +78,23 @@ class FastRatingStarState extends FastFormFieldState<double> {
   FastRatingStar get widget => super.widget as FastRatingStar;
 }
 
-final RatingStarLabelBuilder ratingStarLabelBuilder =
-    (FastRatingStarState state) {
+String ratingStarLabelBuilder(FastRatingStarState state) {
   return state.value!.toStringAsFixed(0);
-};
+}
 
-final RatingStarFixBuilder ratingStarSuffixBuilder =
-    (FastRatingStarState state) {
-  return Container(
+Widget ratingStarSuffixBuilder(FastRatingStarState state) {
+  return SizedBox(
     width: 32.0,
     child: Text(
       state.value!.toStringAsFixed(0),
-      style: TextStyle(
+      style: const TextStyle(
         fontSize: 16.0,
       ),
     ),
   );
-};
+}
 
-final FormFieldBuilder<double> ratingStarBuilder =
-    (FormFieldState<double> field) {
+Widget ratingStarBuilder(FormFieldState<double> field) {
   final state = field as FastRatingStarState;
   final context = state.context;
   final widget = state.widget;
@@ -135,4 +132,4 @@ final FormFieldBuilder<double> ratingStarBuilder =
       ],
     ),
   );
-};
+}

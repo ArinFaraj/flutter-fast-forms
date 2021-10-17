@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:extended_image/extended_image.dart';
@@ -27,7 +28,7 @@ class FastFilePicker extends FastFormField<String?> {
     FormFieldBuilder<String?>? builder,
     this.removeText,
     this.changeText,
-    this.contentPadding,
+    EdgeInsetsGeometry? contentPadding,
     this.heroTag,
     this.currentFile,
     this.fileType = FileTypeCross.image,
@@ -58,8 +59,7 @@ class FastFilePicker extends FastFormField<String?> {
     this.useBigPreview = true,
     this.usePreviewDialog = true,
     FormFieldValidator<String>? validator,
-  })  : initialValue = initialValue,
-        super(
+  }) : super(
           adaptive: adaptive,
           autofocus: autofocus,
           autovalidateMode: autovalidateMode,
@@ -87,7 +87,6 @@ class FastFilePicker extends FastFormField<String?> {
   final String? removeText;
   final String? changeText;
   final String? savedFolderPath;
-  final EdgeInsetsGeometry? contentPadding;
   final String? currentFile;
   final FileTypeCross fileType;
   final ErrorBuilder<String>? errorBuilder;
@@ -99,7 +98,6 @@ class FastFilePicker extends FastFormField<String?> {
   final double height;
   final HelperBuilder<String>? helperBuilder;
   final String? helpText;
-  final String? initialValue;
   final Locale? locale;
   final String modalCancelButtonText;
   final String modalDoneButtonText;
@@ -118,8 +116,8 @@ class FastFilePickerState extends FastFormFieldState<String?> {
   FastFilePicker get widget => super.widget as FastFilePicker;
 }
 
-final FilePickerIconButtonBuilder filePickerIconButtonBuilder =
-    (FastFilePickerState state, ShowFilePicker show) {
+Widget filePickerIconButtonBuilder(
+    FastFilePickerState state, ShowFilePicker show) {
   final widget = state.widget;
 
   return SizedBox(
@@ -134,9 +132,7 @@ final FilePickerIconButtonBuilder filePickerIconButtonBuilder =
           ),
           onPressed: widget.enabled ? () => show(widget.fileType) : null,
         ),
-        SizedBox(
-          height: 10,
-        ),
+        const SizedBox(height: 10),
         OutlinedButton(
           child: Padding(
             padding: const EdgeInsets.all(8.0),
@@ -147,10 +143,9 @@ final FilePickerIconButtonBuilder filePickerIconButtonBuilder =
       ],
     ),
   );
-};
+}
 
-final FormFieldBuilder<String?> filePickerBuilder =
-    (FormFieldState<String?> field) {
+Widget filePickerBuilder(FormFieldState<String?> field) {
   final state = field as FastFilePickerState;
   final context = state.context;
   final widget = state.widget;
@@ -161,7 +156,7 @@ final FormFieldBuilder<String?> filePickerBuilder =
   final InputDecoration effectiveDecoration =
       decoration.applyDefaults(Theme.of(context).inputDecorationTheme);
 
-  final ShowFilePicker show = (FileTypeCross type) async {
+  void show(FileTypeCross type) async {
     try {
       var value = await FilePickerCross.importFromStorage(
         type: type,
@@ -169,16 +164,16 @@ final FormFieldBuilder<String?> filePickerBuilder =
       state.didChange(value.path);
     } catch (e) {
       String _exceptionData = (e as dynamic).reason();
-      print('----------------------');
-      print('REASON: $_exceptionData');
+      log('----------------------');
+      log('REASON: $_exceptionData');
       if (_exceptionData == 'read_external_storage_denied') {
         throw Exception('Permission was denied');
       } else if (_exceptionData == 'selection_canceled') {
-        print('User canceled operation');
+        log('User canceled operation');
       }
-      print('----------------------');
+      log('----------------------');
     }
-  };
+  }
 
   File? file;
   if (state.value != null && state.value!.isNotEmpty) {
@@ -206,7 +201,7 @@ final FormFieldBuilder<String?> filePickerBuilder =
               children: [
                 if (state.value == null || state.value!.isEmpty)
                   InkWell(
-                    borderRadius: BorderRadius.all(Radius.circular(20)),
+                    borderRadius: const BorderRadius.all(Radius.circular(20)),
                     onTap:
                         widget.enabled ? () => show(FileTypeCross.image) : null,
                     child: Container(
@@ -217,19 +212,20 @@ final FormFieldBuilder<String?> filePickerBuilder =
                           color: Theme.of(context).colorScheme.secondary,
                         ),
                         //color:Colors.transparent,
-                        borderRadius: BorderRadius.all(
+                        borderRadius: const BorderRadius.all(
                           Radius.circular(20),
                         ),
                       ),
-                      child: Center(
-                        child: const Icon(Icons.image_outlined),
+                      child: const Center(
+                        child: Icon(Icons.image_outlined),
                       ),
                     ),
                   ),
                 if (state.value != null && state.value!.isNotEmpty)
                   exist
                       ? InkWell(
-                          borderRadius: BorderRadius.all(Radius.circular(20)),
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(20)),
                           onTap: widget.usePreviewDialog
                               ? () => openFileDialog(context, file!)
                               : null,
@@ -237,7 +233,7 @@ final FormFieldBuilder<String?> filePickerBuilder =
                             tag: widget.heroTag ?? file.toString(),
                             child: ClipRRect(
                               borderRadius:
-                                  BorderRadius.all(Radius.circular(20)),
+                                  const BorderRadius.all(Radius.circular(20)),
                               child: ExtendedImage.file(
                                 file!,
                                 fit: BoxFit.cover,
@@ -253,7 +249,7 @@ final FormFieldBuilder<String?> filePickerBuilder =
                               onPressed: widget.enabled
                                   ? () => show(FileTypeCross.image)
                                   : null,
-                              icon: Icon(
+                              icon: const Icon(
                                 Icons.warning_rounded,
                                 color: Colors.red,
                               ),
@@ -267,7 +263,7 @@ final FormFieldBuilder<String?> filePickerBuilder =
       ],
     ),
   );
-};
+}
 
 openFileDialog(BuildContext context, File path) {
   showDialog(

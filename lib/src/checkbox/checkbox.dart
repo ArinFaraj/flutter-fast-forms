@@ -62,6 +62,7 @@ class FastCheckboxState extends FastFormFieldState<bool> {
   FastCheckbox get widget => super.widget as FastCheckbox;
 }
 
+// ignore: prefer_function_declarations_over_variables
 final CheckboxTitleBuilder checkboxTitleBuilder = (FastCheckboxState state) {
   return Builder(builder: (context) {
     return Text(

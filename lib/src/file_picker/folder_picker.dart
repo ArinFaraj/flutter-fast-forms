@@ -1,3 +1,4 @@
+import 'dart:developer';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -26,7 +27,6 @@ class FastFolderPicker extends FastFormField<String?> {
     this.removeText,
     this.changeText,
     this.trailingPath,
-    this.contentPadding,
     this.currentFolder,
     InputDecoration? decoration,
     bool enabled = true,
@@ -40,7 +40,6 @@ class FastFolderPicker extends FastFormField<String?> {
     String? helperText,
     this.helpText,
     required String id,
-    String? initialValue,
     Key? key,
     String? label,
     this.locale,
@@ -53,9 +52,10 @@ class FastFolderPicker extends FastFormField<String?> {
     this.showModalPopup = false,
     this.useBigPreview = true,
     this.usePreviewDialog = true,
+    String? initialValue,
+    EdgeInsetsGeometry? contentPadding,
     FormFieldValidator<String>? validator,
-  })  : initialValue = initialValue,
-        super(
+  }) : super(
           adaptive: adaptive,
           autofocus: autofocus,
           autovalidateMode: autovalidateMode,
@@ -83,7 +83,6 @@ class FastFolderPicker extends FastFormField<String?> {
   final String? removeText;
   final String? changeText;
   final String? trailingPath;
-  final EdgeInsetsGeometry? contentPadding;
   final String? currentFolder;
   final ErrorBuilder<String>? errorBuilder;
   final String? errorFormatText;
@@ -93,7 +92,6 @@ class FastFolderPicker extends FastFormField<String?> {
   final double height;
   final HelperBuilder<String>? helperBuilder;
   final String? helpText;
-  final String? initialValue;
   final Locale? locale;
   final String modalCancelButtonText;
   final String modalDoneButtonText;
@@ -112,21 +110,20 @@ class FastFolderPickerState extends FastFormFieldState<String?> {
   FastFolderPicker get widget => super.widget as FastFolderPicker;
 }
 
-final FolderPickerIconButtonBuilder folderPickerIconButtonBuilder =
-    (FastFolderPickerState state, ShowFolderPicker show) {
+Widget folderPickerIconButtonBuilder(
+    FastFolderPickerState state, ShowFolderPicker show) {
   final widget = state.widget;
 
   return OutlinedButton(
-    child: Padding(
-      padding: const EdgeInsets.all(8.0),
+    child: const Padding(
+      padding: EdgeInsets.all(8.0),
       child: Icon(Icons.folder_rounded),
     ),
     onPressed: widget.enabled ? () => show() : null,
   );
-};
+}
 
-final FormFieldBuilder<String?> folderPickerBuilder =
-    (FormFieldState<String?> field) {
+Widget folderPickerBuilder(FormFieldState<String?> field) {
   final state = field as FastFolderPickerState;
   final context = state.context;
   final widget = state.widget;
@@ -137,14 +134,14 @@ final FormFieldBuilder<String?> folderPickerBuilder =
   final InputDecoration effectiveDecoration =
       decoration.applyDefaults(Theme.of(context).inputDecorationTheme);
 
-  final ShowFolderPicker show = () async {
+  void show() async {
     try {
       String? pathForExports = await FilePicker.platform.getDirectoryPath();
       if (pathForExports == null) throw Exception('selection_canceled');
 // you parse the file's directory and use it for later automated exports.
       // pathForExports =
       //     pathForExports.substring(0, pathForExports.lastIndexOf(r'/'));
-      print(pathForExports);
+      log(pathForExports);
 
       state.didChange(
         path_helper.join(
@@ -154,16 +151,16 @@ final FormFieldBuilder<String?> folderPickerBuilder =
       );
     } catch (e) {
       String _exceptionData = (e as dynamic).toString();
-      print('----------------------');
-      print('REASON: $_exceptionData');
+      log('----------------------');
+      log('REASON: $_exceptionData');
       if (_exceptionData.contains('read_external_storage_denied')) {
         throw Exception('Permission was denied');
       } else if (_exceptionData.contains('selection_canceled')) {
-        print('User canceled operation');
+        log('User canceled operation');
       }
-      print('----------------------');
+      log('----------------------');
     }
-  };
+  }
 
   return InputDecorator(
     decoration: effectiveDecoration.copyWith(
@@ -188,4 +185,4 @@ final FormFieldBuilder<String?> folderPickerBuilder =
       ],
     ),
   );
-};
+}

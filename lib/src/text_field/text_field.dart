@@ -50,7 +50,6 @@ class FastTextField extends FastFormField<String> {
     this.textAlignVertical,
     this.textCapitalization = TextCapitalization.none,
     this.trailing,
-    FormFieldValidator<String>? validator,
   })  : controller = TextEditingController(text: initialValue),
         super(
           adaptive: adaptive,
@@ -241,7 +240,7 @@ Widget adaptiveTextFieldBuilder(FormFieldState<String> field) {
     }
   }
   return textFieldBuilder(field);
-};
+}
 
 extension TextEditingControllerExt on TextEditingController {
   void selectAll() {

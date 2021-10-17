@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 
 import '../form_field.dart';
@@ -26,7 +28,7 @@ class FastObjectList<T> extends FastFormField<List<T>> {
     String? label,
     ValueChanged<List<T>>? onChanged,
     VoidCallback? onReset,
-    this.onSaved,
+    FormFieldSetter<List<T>>? onSaved,
     this.selectedItemBuilder,
     required this.headerBuilder,
     required this.itemBuilder,
@@ -57,7 +59,6 @@ class FastObjectList<T> extends FastFormField<List<T>> {
   final Type t;
   final Widget? hint;
   final List<String> items;
-  final FormFieldSetter<List<T>>? onSaved;
   final DropdownButtonBuilder? selectedItemBuilder;
   final ObjectListHeaderBuilder headerBuilder;
   final ObjectListItemBuilder itemBuilder;
@@ -70,8 +71,7 @@ class FastObjectListState<T> extends FastFormFieldState<List<T>> {
   FastObjectList<T> get widget => super.widget as FastObjectList<T>;
 }
 
-final FormFieldBuilder<List<dynamic>> objectListBuilder =
-    (FormFieldState<List<dynamic>> field) {
+Widget objectListBuilder(FormFieldState<List<dynamic>> field) {
   final state = field as FastObjectListState;
   final widget = state.widget;
 
@@ -92,10 +92,10 @@ final FormFieldBuilder<List<dynamic>> objectListBuilder =
           mainAxisSize: MainAxisSize.min,
           children: [
             widget.headerBuilder(context, (value) {
-              print('adding $value');
+              log('adding $value');
               state.value!.insert(0, value);
               field.didChange(state.value!);
-              print('currently ${state.value}');
+              log('currently ${state.value}');
             }),
             Expanded(
               child: ListView.builder(
@@ -103,7 +103,7 @@ final FormFieldBuilder<List<dynamic>> objectListBuilder =
                 itemCount: state.value?.length ?? 0,
                 itemBuilder: (context, index) {
                   return widget.itemBuilder(context, state.value![index], () {
-                    print('removing $index');
+                    log('removing $index');
                     state.value!.remove(state.value![index]);
                     field.didChange(state.value!);
                   });
@@ -115,4 +115,4 @@ final FormFieldBuilder<List<dynamic>> objectListBuilder =
       ),
     );
   });
-};
+}

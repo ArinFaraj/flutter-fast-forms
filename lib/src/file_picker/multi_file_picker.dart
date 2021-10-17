@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:extended_image/extended_image.dart';
@@ -30,7 +31,7 @@ class FastMultiFilePicker extends FastFormField<List<String>> {
     FormFieldBuilder<List<String>>? builder,
     this.removeText,
     this.changeText,
-    this.contentPadding,
+    EdgeInsetsGeometry? contentPadding,
     this.currentFile,
     this.savedFolderPath,
     this.fileType = FileTypeCross.image,
@@ -46,7 +47,7 @@ class FastMultiFilePicker extends FastFormField<List<String>> {
     String? helperText,
     this.helpText,
     required String id,
-    List<String>? initialValue,
+    List<String>? initialValue = const [],
     Key? key,
     String? label,
     this.locale,
@@ -60,8 +61,7 @@ class FastMultiFilePicker extends FastFormField<List<String>> {
     this.useBigPreview = true,
     this.usePreviewDialog = true,
     FormFieldValidator<List<String>>? validator,
-  })  : initialValue = initialValue ?? [],
-        super(
+  }) : super(
           adaptive: adaptive,
           autofocus: autofocus,
           autovalidateMode: autovalidateMode,
@@ -89,7 +89,6 @@ class FastMultiFilePicker extends FastFormField<List<String>> {
   final String? removeText;
   final String? changeText;
   final String? savedFolderPath;
-  final EdgeInsetsGeometry? contentPadding;
   final String? currentFile;
   final FileTypeCross fileType;
   final ErrorBuilder<String>? errorBuilder;
@@ -100,7 +99,6 @@ class FastMultiFilePicker extends FastFormField<List<String>> {
   final double height;
   final HelperBuilder<String>? helperBuilder;
   final String? helpText;
-  final List<String> initialValue;
   final Locale? locale;
   final String modalCancelButtonText;
   final String modalDoneButtonText;
@@ -119,8 +117,8 @@ class FastMultiFilePickerState extends FastFormFieldState<List<String>> {
   FastMultiFilePicker get widget => super.widget as FastMultiFilePicker;
 }
 
-final MultiFilePickerIconButtonBuilder multifilePickerIconButtonBuilder =
-    (FastMultiFilePickerState state, ShowMultiFilePicker show) {
+Widget multifilePickerIconButtonBuilder(
+    FastMultiFilePickerState state, ShowMultiFilePicker show) {
   final widget = state.widget;
 
   return SizedBox(
@@ -135,7 +133,7 @@ final MultiFilePickerIconButtonBuilder multifilePickerIconButtonBuilder =
           ),
           onPressed: widget.enabled ? () => show(widget.fileType) : null,
         ),
-        SizedBox(
+        const SizedBox(
           height: 10,
         ),
         OutlinedButton(
@@ -148,10 +146,9 @@ final MultiFilePickerIconButtonBuilder multifilePickerIconButtonBuilder =
       ],
     ),
   );
-};
+}
 
-final FormFieldBuilder<List<String>> multifilePickerBuilder =
-    (FormFieldState<List<String>> field) {
+Widget multifilePickerBuilder(FormFieldState<List<String>> field) {
   final state = field as FastMultiFilePickerState;
   final context = state.context;
   final widget = state.widget;
@@ -162,7 +159,7 @@ final FormFieldBuilder<List<String>> multifilePickerBuilder =
   final InputDecoration effectiveDecoration =
       decoration.applyDefaults(Theme.of(context).inputDecorationTheme);
 
-  final ShowMultiFilePicker show = (FileTypeCross type) async {
+  void show(FileTypeCross type) async {
     try {
       var value = await FilePickerCross.importMultipleFromStorage(type: type);
 
@@ -171,16 +168,17 @@ final FormFieldBuilder<List<String>> multifilePickerBuilder =
       state.didChange(files);
     } catch (e) {
       String _exceptionData = (type as dynamic).reason();
-      print('----------------------');
-      print('REASON: $_exceptionData');
+      log('----------------------');
+      log('REASON: $_exceptionData');
       if (_exceptionData == 'read_external_storage_denied') {
         throw Exception('Permission was denied');
       } else if (_exceptionData == 'selection_canceled') {
-        print('User canceled operation');
+        log('User canceled operation');
       }
-      print('----------------------');
+      log('----------------------');
     }
-  };
+  }
+
   return InputDecorator(
     decoration: effectiveDecoration.copyWith(
       contentPadding: widget.contentPadding,
@@ -213,14 +211,15 @@ final FormFieldBuilder<List<String>> multifilePickerBuilder =
                     clipBehavior: Clip.none,
                     children: [
                       AnimatedOpacity(
-                        duration: Duration(milliseconds: 100),
+                        duration: const Duration(milliseconds: 100),
                         opacity: wid,
                         child: ClipRRect(
-                          borderRadius: BorderRadius.all(Radius.circular(20)),
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(20)),
                           child: exist
                               ? InkWell(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(20)),
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(20)),
                                   onTap: widget.usePreviewDialog
                                       ? () => openFileDialog(context, file)
                                       : null,
@@ -237,7 +236,7 @@ final FormFieldBuilder<List<String>> multifilePickerBuilder =
                                       onPressed: widget.enabled
                                           ? () => show(FileTypeCross.image)
                                           : null,
-                                      icon: Icon(
+                                      icon: const Icon(
                                         Icons.warning_rounded,
                                         color: Colors.red,
                                       ),
@@ -250,19 +249,20 @@ final FormFieldBuilder<List<String>> multifilePickerBuilder =
                         top: -5,
                         right: -10,
                         child: MaterialButton(
-                          shape: CircleBorder(),
+                          shape: const CircleBorder(),
                           color: Colors.red,
                           onPressed: () async {
                             setState(() {
                               wid = 0;
                             });
-                            await Future.delayed(Duration(milliseconds: 99));
+                            await Future.delayed(
+                                const Duration(milliseconds: 99));
                             var files = state.value!;
                             files.removeAt(index);
 
                             state.didChange(files);
                           },
-                          child: Icon(Icons.remove_outlined),
+                          child: const Icon(Icons.remove_outlined),
                         ),
                       ),
                     ],
@@ -271,7 +271,7 @@ final FormFieldBuilder<List<String>> multifilePickerBuilder =
               },
             ),
           InkWell(
-            borderRadius: BorderRadius.all(Radius.circular(20)),
+            borderRadius: const BorderRadius.all(Radius.circular(20)),
             onTap: widget.enabled ? () => show(FileTypeCross.image) : null,
             child: Container(
               height: widget.height,
@@ -281,15 +281,15 @@ final FormFieldBuilder<List<String>> multifilePickerBuilder =
                   color: Theme.of(context).colorScheme.secondary,
                 ),
                 //color:Colors.transparent,
-                borderRadius: BorderRadius.all(
+                borderRadius: const BorderRadius.all(
                   Radius.circular(20),
                 ),
               ),
-              child: Center(child: const Icon(Icons.add)),
+              child: const Center(child: Icon(Icons.add)),
             ),
           ),
         ],
       ),
     ),
   );
-};
+}
