@@ -9,26 +9,30 @@ import '../form_scope.dart';
 class FastTextField extends FastFormField<String> {
   FastTextField({
     bool? adaptive,
-    this.autocorrect = true,
-    this.autofillHints,
     bool autofocus = false,
     AutovalidateMode autovalidateMode = AutovalidateMode.onUserInteraction,
-    this.buildCounter,
     FormFieldBuilder<String>? builder,
     EdgeInsetsGeometry? contentPadding,
     InputDecoration? decoration,
     bool enabled = true,
+    String? helperText,
+    required String id,
+    String initialValue = '',
+    Key? key,
+    String? label,
+    ValueChanged<String>? onChanged,
+    VoidCallback? onReset,
+    FormFieldSetter<String>? onSaved,
+    FormFieldValidator<String>? validator,
+    this.autocorrect = true,
+    this.autofillHints,
+    this.buildCounter,
     this.enableInteractiveSelection = true,
     this.enableSuggestions = true,
     this.expands = false,
     this.focusNode,
-    String? helperText,
-    required String id,
-    String initialValue = '',
     this.inputFormatters,
-    Key? key,
     this.keyboardType,
-    String? label,
     this.leading,
     this.maxLength,
     this.maxLengthEnforcement,
@@ -36,9 +40,6 @@ class FastTextField extends FastFormField<String> {
     this.minLines,
     this.obscureText = false,
     this.obscuringCharacter = '•',
-    ValueChanged<String>? onChanged,
-    VoidCallback? onReset,
-    FormFieldSetter<String>? onSaved,
     this.padding,
     this.placeholder,
     this.prefix,
@@ -122,7 +123,7 @@ class FastTextFieldState extends FastFormFieldState<String> {
       touched ? AutovalidateMode.always : AutovalidateMode.disabled;
 }
 
-final InputCounterWidgetBuilder inputCounterWidgetBuilder = (
+Text inputCounterWidgetBuilder(
   BuildContext context, {
   required int currentLength,
   required int? maxLength,
@@ -132,10 +133,9 @@ final InputCounterWidgetBuilder inputCounterWidgetBuilder = (
     '$currentLength / $maxLength',
     semanticsLabel: 'character input count',
   );
-};
+}
 
-final FormFieldBuilder<String> textFieldBuilder =
-    (FormFieldState<String> field) {
+TextFormField textFieldBuilder(FormFieldState<String> field) {
   final state = field as FastTextFieldState;
   final widget = state.widget;
   final theme = Theme.of(state.context);
@@ -146,11 +146,11 @@ final FormFieldBuilder<String> textFieldBuilder =
   final InputDecoration effectiveDecoration =
       _decoration.applyDefaults(theme.inputDecorationTheme).copyWith(
             contentPadding: widget.contentPadding,
-            prefix: widget.prefix != null && !(widget.prefix is Icon)
+            prefix: widget.prefix != null && widget.prefix is! Icon
                 ? widget.prefix
                 : null,
             prefixIcon: widget.prefix is Icon ? widget.prefix : null,
-            suffix: widget.suffix != null && !(widget.suffix is Icon)
+            suffix: widget.suffix != null && widget.suffix is! Icon
                 ? widget.suffix
                 : null,
             suffixIcon: widget.suffix is Icon ? widget.suffix : null,
@@ -189,10 +189,10 @@ final FormFieldBuilder<String> textFieldBuilder =
     textCapitalization: widget.textCapitalization,
     validator: widget.validator,
   );
-};
+}
 
-final FormFieldBuilder<String> cupertinoTextFieldBuilder =
-    (FormFieldState<String> field) {
+CupertinoTextFormFieldRow cupertinoTextFieldBuilder(
+    FormFieldState<String> field) {
   final state = field as FastTextFieldState;
   final widget = state.widget;
   final prefix =
@@ -226,10 +226,9 @@ final FormFieldBuilder<String> cupertinoTextFieldBuilder =
     textCapitalization: widget.textCapitalization,
     validator: widget.validator,
   );
-};
+}
 
-final FormFieldBuilder<String> adaptiveTextFieldBuilder =
-    (FormFieldState<String> field) {
+Widget adaptiveTextFieldBuilder(FormFieldState<String> field) {
   final state = field as FastTextFieldState;
 
   if (state.adaptive) {

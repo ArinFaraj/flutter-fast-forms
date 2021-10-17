@@ -1,23 +1,25 @@
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_fast_forms/flutter_fast_forms.dart';
 
 import 'dropdown/dropdown.dart';
 import 'form_field.dart';
 import 'form_scope.dart';
 import 'text_field/text_field.dart';
 
-typedef FormChanged = void Function(Map<String, dynamic> values);
+typedef FormChanged = void Function(
+    UnmodifiableMapView<String, dynamic> values);
 
 @immutable
 class FastForm extends StatefulWidget {
-  FastForm({
+  const FastForm({
+    Key? key,
     this.adaptive = false,
     this.builders = const {},
     required this.children,
     required this.formKey,
     this.inputDecorator,
-    Key? key,
     this.onChanged,
   }) : super(key: key);
 
@@ -36,11 +38,9 @@ class FastFormState extends State<FastForm> {
   final Set<FastFormFieldState<dynamic>> _fields = {};
 
   UnmodifiableMapView<String, dynamic> get values {
-    return UnmodifiableMapView(Map.fromIterable(
-      _fields,
-      key: (state) => state.widget.id,
-      value: (state) => state.value,
-    ));
+    return UnmodifiableMapView({
+      for (var fieldState in _fields) fieldState.widget.id: fieldState.value
+    });
   }
 
   void register(FastFormFieldState state) {
@@ -58,7 +58,8 @@ class FastFormState extends State<FastForm> {
   @override
   Widget build(BuildContext context) {
     return Form(
-      // onChanged: () =>, // Current store cannot be retrieved here due to the framework calling this before widget.onChanged
+      // Current store cannot be retrieved here due to the framework calling this before widget.onChanged
+      // onChanged: () =>,
       key: widget.formKey,
       child: FastFormScope(
         adaptive: widget.adaptive,
@@ -73,14 +74,16 @@ class FastFormState extends State<FastForm> {
   }
 }
 
-final FastInputDecorator _inputDecorationCreator =
-    (BuildContext context, FastFormField field) {
+InputDecoration _inputDecorationCreator(
+    BuildContext context, FastFormField field) {
   final theme = Theme.of(context);
   final enabled = field.enabled;
   return InputDecoration(
-    contentPadding: (field is FastDropdown || field is FastTextField)
-        ? EdgeInsets.fromLTRB(12.0, 20.0, 12.0, 20.0)
-        : EdgeInsets.fromLTRB(12.0, 8.0, 12.0, 8.0),
+    contentPadding: (field is FastDropdown ||
+            field is FastTextField ||
+            field is FastAutocomplete)
+        ? const EdgeInsets.fromLTRB(12.0, 20.0, 12.0, 20.0)
+        : const EdgeInsets.fromLTRB(12.0, 8.0, 12.0, 8.0),
     labelText: field.label,
     helperText: field.helperText,
     hintText: field is FastTextField ? field.placeholder : null,
@@ -97,7 +100,7 @@ final FastInputDecorator _inputDecorationCreator =
     focusedBorder: OutlineInputBorder(
       borderSide: BorderSide(color: theme.primaryColor, width: 2),
     ),
-    errorBorder: OutlineInputBorder(
+    errorBorder: const OutlineInputBorder(
       borderSide: BorderSide(color: Colors.red, width: 2),
     ),
     focusedErrorBorder: OutlineInputBorder(
@@ -106,4 +109,4 @@ final FastInputDecorator _inputDecorationCreator =
     filled: false,
     fillColor: Colors.white,
   );
-};
+}

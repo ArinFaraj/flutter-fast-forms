@@ -9,14 +9,10 @@ class FastSegmentedControl extends FastFormField<String> {
   FastSegmentedControl({
     bool autofocus = false,
     AutovalidateMode autovalidateMode = AutovalidateMode.onUserInteraction,
-    this.backgroundColor = CupertinoColors.tertiarySystemFill,
     FormFieldBuilder<String>? builder,
-    required this.children,
     EdgeInsetsGeometry? contentPadding,
     InputDecoration? decoration,
     bool enabled = true,
-    this.errorBuilder,
-    this.helperBuilder,
     String? helperText,
     required String id,
     String? initialValue,
@@ -25,9 +21,13 @@ class FastSegmentedControl extends FastFormField<String> {
     ValueChanged<String>? onChanged,
     VoidCallback? onReset,
     FormFieldSetter<String>? onSaved,
+    FormFieldValidator<String>? validator,
+    this.backgroundColor = CupertinoColors.tertiarySystemFill,
+    required this.children,
+    this.errorBuilder,
+    this.helperBuilder,
     this.padding = const EdgeInsets.symmetric(vertical: 2, horizontal: 3),
     this.thumbColor,
-    FormFieldValidator<String>? validator,
   })  : assert(children.length >= 2),
         super(
           autofocus: autofocus,
@@ -69,8 +69,8 @@ class FastSegmentedControlState extends FastFormFieldState<String> {
   FastSegmentedControl get widget => super.widget as FastSegmentedControl;
 }
 
-final FormFieldBuilder<String> cupertinoSegmentedControlBuilder =
-    (FormFieldState<String> field) {
+CupertinoFormRow cupertinoSegmentedControlBuilder(
+    FormFieldState<String> field) {
   final state = field as FastSegmentedControlState;
   final widget = state.widget;
 
@@ -86,10 +86,10 @@ final FormFieldBuilder<String> cupertinoSegmentedControlBuilder =
       onValueChanged: state.didChange,
       padding: widget.padding,
       thumbColor: widget.thumbColor ??
-          CupertinoDynamicColor.withBrightness(
+          const CupertinoDynamicColor.withBrightness(
             color: Color(0xFFFFFFFF),
             darkColor: Color(0xFF636366),
           ),
     ),
   );
-};
+}

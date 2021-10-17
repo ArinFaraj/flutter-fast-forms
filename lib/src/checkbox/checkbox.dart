@@ -22,10 +22,10 @@ class FastCheckbox extends FastFormField<bool> {
     ValueChanged<bool>? onChanged,
     VoidCallback? onReset,
     FormFieldSetter<bool>? onSaved,
+    FormFieldValidator<bool>? validator,
     required this.title,
     this.titleBuilder,
     this.tristate = false,
-    FormFieldValidator<bool>? validator,
   }) : super(
           autofocus: autofocus,
           autovalidateMode: autovalidateMode,
@@ -77,7 +77,7 @@ final CheckboxTitleBuilder checkboxTitleBuilder = (FastCheckboxState state) {
   });
 };
 
-final FormFieldBuilder<bool> checkboxBuilder = (FormFieldState<bool> field) {
+InputDecorator checkboxBuilder(FormFieldState<bool> field) {
   final state = field as FastCheckboxState;
   final widget = state.widget;
 
@@ -107,4 +107,4 @@ final FormFieldBuilder<bool> checkboxBuilder = (FormFieldState<bool> field) {
       );
     }),
   );
-};
+}

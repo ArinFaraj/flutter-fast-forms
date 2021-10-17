@@ -6,7 +6,7 @@ import '../test_utils.dart';
 
 void main() {
   testWidgets('renders FastRadioGroup widget', (WidgetTester tester) async {
-    final options = [
+    const options = [
       RadioOption(title: 'Option 1', value: 'option-1'),
       RadioOption(title: 'Option 2', value: 'option-2'),
     ];
@@ -22,7 +22,7 @@ void main() {
     final widget =
         tester.widget(fastRadioGroupFinder) as FastRadioGroup<String>;
 
-    final optionsFinder = find.byType(RadioListTile);
+    final optionsFinder = find.byType(typeOf<RadioListTile<String>>());
 
     expect(fastRadioGroupFinder, findsOneWidget);
 
@@ -32,7 +32,7 @@ void main() {
 
   testWidgets('renders FastRadioGroup widget horizontally',
       (WidgetTester tester) async {
-    final options = [
+    const options = [
       RadioOption(title: 'Option 1', value: 'option-1'),
       RadioOption(title: 'Option 2', value: 'option-2'),
     ];
@@ -46,14 +46,14 @@ void main() {
     ));
 
     final expandedFinder = find.byType(Expanded);
-    final optionsFinder = find.byType(RadioListTile);
+    final optionsFinder = find.byType(typeOf<RadioListTile<String>>());
 
     expect(expandedFinder, findsNWidgets(options.length));
     expect(optionsFinder, findsNWidgets(options.length));
   });
 
   testWidgets('updates FastRadioGroup value', (WidgetTester tester) async {
-    final options = [
+    const options = [
       RadioOption(title: 'Option 1', value: 'option-1'),
       RadioOption(title: 'Option 2', value: 'option-2'),
     ];
@@ -69,7 +69,7 @@ void main() {
     final state =
         tester.state(fastRadioGroupFinder) as FastRadioGroupState<String>;
 
-    final optionsFinder = find.byType(RadioListTile);
+    final optionsFinder = find.byType(typeOf<RadioListTile<String>>());
 
     expect(state.value, options.first.value);
 
@@ -80,11 +80,11 @@ void main() {
   });
 
   testWidgets('validates FastRadioGroup', (WidgetTester tester) async {
-    final invalidOption =
+    const errorText = 'Do not touch this';
+    const invalidOption =
         RadioOption(title: 'Invalid Option', value: 'invalid-option');
-    final errorText = 'Do not touch this';
     final options = [
-      RadioOption(title: 'Option 1', value: 'option-1'),
+      const RadioOption(title: 'Option 1', value: 'option-1'),
       invalidOption,
     ];
 

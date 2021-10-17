@@ -1,3 +1,16 @@
+## [v1.1.0] - 10/16/2021
+
+* introduces `FastAutocomplete<T>` widget
+* introduces `FastChoiceChips` widget
+
+## [v1.0.1] - 10/14/2021
+
+* internal `FastFormFieldState<T>` refactoring
+
+## [v1.0.0] - 10/13/2021
+
+* migration to Flutter `2.5`
+
 ## [v0.9.0] - 03/21/2021
 
 * removes `mask_text_input_formatter` dependency

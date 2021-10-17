@@ -13,19 +13,19 @@ class FastCalendar extends FastFormField<DateTime> {
     EdgeInsetsGeometry? contentPadding,
     InputDecoration? decoration,
     bool enabled = true,
-    required this.firstDate,
     String? helperText,
     required String id,
-    this.initialCalendarMode = DatePickerMode.day,
     DateTime? initialValue,
     Key? key,
     String? label,
-    required this.lastDate,
     ValueChanged<DateTime>? onChanged,
     VoidCallback? onReset,
     FormFieldSetter<DateTime>? onSaved,
-    this.selectableDayPredicate,
     FormFieldValidator<DateTime>? validator,
+    required this.firstDate,
+    this.initialCalendarMode = DatePickerMode.day,
+    required this.lastDate,
+    this.selectableDayPredicate,
   }) : super(
           autofocus: autofocus,
           autovalidateMode: autovalidateMode,
@@ -64,8 +64,7 @@ class FastCalendarState extends FastFormFieldState<DateTime> {
   FastCalendar get widget => super.widget as FastCalendar;
 }
 
-final FormFieldBuilder<DateTime> calendarBuilder =
-    (FormFieldState<DateTime> field) {
+InputDecorator calendarBuilder(FormFieldState<DateTime> field) {
   final state = field as FastCalendarState;
   final widget = state.widget;
   final theme = Theme.of(state.context);
@@ -89,4 +88,4 @@ final FormFieldBuilder<DateTime> calendarBuilder =
       selectableDayPredicate: widget.selectableDayPredicate,
     ),
   );
-};
+}

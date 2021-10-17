@@ -6,13 +6,15 @@ import 'package:flutter_fast_forms/flutter_fast_forms.dart';
 import 'custom_form_field.dart';
 
 void main() {
-  runApp(ExampleApp());
+  runApp(const ExampleApp());
 }
 
 class ExampleApp extends StatelessWidget {
+  const ExampleApp({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
-    final title = 'Flutter Fast Forms Example';
+    const title = 'Flutter Fast Forms Example';
 
     switch (Theme.of(context).platform) {
       case TargetPlatform.iOS:
@@ -42,7 +44,7 @@ class ExampleApp extends StatelessWidget {
 class FormPage extends StatelessWidget {
   FormPage({Key? key, required this.title}) : super(key: key);
 
-  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  final formKey = GlobalKey<FormState>();
   final String title;
 
   @override
@@ -60,12 +62,14 @@ class FormPage extends StatelessWidget {
                   FastForm(
                     adaptive: true,
                     formKey: formKey,
-                    children: _buildCupertinoFormModel(context),
-                    onChanged: (value) =>
-                        print('Form changed: ${value.toString()}'),
+                    children: _buildCupertinoForm(context),
+                    onChanged: (value) {
+                      // ignore: avoid_print
+                      print('Form changed: ${value.toString()}');
+                    },
                   ),
                   CupertinoButton(
-                    child: Text('Reset'),
+                    child: const Text('Reset'),
                     onPressed: () => formKey.currentState?.reset(),
                   )
                 ],
@@ -86,12 +90,14 @@ class FormPage extends StatelessWidget {
                 children: [
                   FastForm(
                     formKey: formKey,
-                    children: _buildFormModel(context),
-                    onChanged: (value) =>
-                        print('Form changed: ${value.toString()}'),
+                    children: _buildForm(context),
+                    onChanged: (value) {
+                      // ignore: avoid_print
+                      print('Form changed: ${value.toString()}');
+                    },
                   ),
                   ElevatedButton(
-                    child: Text('Reset'),
+                    child: const Text('Reset'),
                     onPressed: () => formKey.currentState?.reset(),
                   )
                 ],
@@ -102,12 +108,12 @@ class FormPage extends StatelessWidget {
     }
   }
 
-  List<Widget> _buildFormModel(BuildContext context) {
+  List<Widget> _buildForm(BuildContext context) {
     return [
       FastFormSection(
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
-        header: Padding(
-          padding: const EdgeInsets.all(12.0),
+        header: const Padding(
+          padding: EdgeInsets.all(12.0),
           child: Text(
             'Form Example Section',
             style: TextStyle(
@@ -117,6 +123,11 @@ class FormPage extends StatelessWidget {
           ),
         ),
         children: [
+          FastAutocomplete<String>(
+            id: 'autocomplete',
+            label: 'Autocomplete',
+            options: const ['Alaska', 'Alabama', 'Connecticut', 'Delaware'],
+          ),
           FastDatePicker(
             id: 'date_picker',
             label: 'Date Picker',
@@ -133,6 +144,31 @@ class FormPage extends StatelessWidget {
             id: 'time_picker',
             label: 'Time Picker',
           ),
+          FastChoiceChips(
+            id: 'choice_chips',
+            label: 'Choice Chips',
+            alignment: WrapAlignment.center,
+            chipPadding: const EdgeInsets.all(8.0),
+            chips: const [
+              FastChoiceChip(
+                label: Text('Flutter'),
+                avatar: FlutterLogo(),
+              ),
+              FastChoiceChip(
+                  label: Text('Android'),
+                  avatar: Icon(
+                    Icons.android_sharp,
+                    size: 16.0,
+                  )),
+              FastChoiceChip(
+                label: Text('Chrome OS'),
+              ),
+            ],
+            validator: (value) => value == null || value.isEmpty
+                ? 'Please select at least one chip'
+                : null,
+            initialValue: const {0, 2},
+          ),
           FastSwitch(
             id: 'switch',
             label: 'Switch',
@@ -145,9 +181,9 @@ class FormPage extends StatelessWidget {
             placeholder: 'MM/JJJJ',
             keyboardType: TextInputType.datetime,
             maxLength: 7,
-            prefix: Icon(Icons.calendar_today),
+            prefix: const Icon(Icons.calendar_today),
             buildCounter: inputCounterWidgetBuilder,
-            inputFormatters: [],
+            inputFormatters: const [],
             validator: Validators.compose([
               Validators.required((_value) => 'Field is required'),
               Validators.minLength(
@@ -159,7 +195,7 @@ class FormPage extends StatelessWidget {
           FastDropdown(
             id: 'dropdown',
             label: 'Dropdown Field',
-            items: [
+            items: const [
               'Norway',
               'Sweden',
               'Finland',
@@ -168,19 +204,19 @@ class FormPage extends StatelessWidget {
             ],
             initialValue: 'Finland',
           ),
-          FastRadioGroup(
+          FastRadioGroup<String>(
             id: 'radio_group',
             label: 'Radio Group Model',
-            options: [
-              RadioOption(
+            options: const [
+              RadioOption<String>(
                 title: 'Option 1',
                 value: 'option-1',
               ),
-              RadioOption(
+              RadioOption<String>(
                 title: 'Option 2',
                 value: 'option-2',
               ),
-              RadioOption(
+              RadioOption<String>(
                 title: 'Option 3',
                 value: 'option-3',
               )
@@ -195,7 +231,7 @@ class FormPage extends StatelessWidget {
             prefixBuilder: (state) {
               final enabled = state.widget.enabled;
               return IconButton(
-                icon: Icon(Icons.volume_off),
+                icon: const Icon(Icons.volume_off),
                 onPressed:
                     enabled ? () => state.didChange(state.widget.min) : null,
               );
@@ -203,7 +239,7 @@ class FormPage extends StatelessWidget {
             suffixBuilder: (state) {
               final enabled = state.widget.enabled;
               return IconButton(
-                icon: Icon(Icons.volume_up),
+                icon: const Icon(Icons.volume_up),
                 onPressed:
                     enabled ? () => state.didChange(state.widget.max) : null,
               );
@@ -224,8 +260,8 @@ class FormPage extends StatelessWidget {
             id: 'custom_form_field',
             label: 'Custom Form Field',
             helperText: "Optionally add some extras",
-            title: Text('Extras'),
-            options: [
+            title: const Text('Extras'),
+            options: const [
               CustomOption(
                 id: 'cheese',
                 label: 'Cheese',
@@ -253,13 +289,13 @@ class FormPage extends StatelessWidget {
     ];
   }
 
-  List<Widget> _buildCupertinoFormModel(BuildContext context) {
+  List<Widget> _buildCupertinoForm(BuildContext context) {
     return [
       FastFormSection(
         adaptive: true,
         insetGrouped: true,
-        padding: EdgeInsets.symmetric(vertical: 12.0),
-        header: Text('Form Example Section'),
+        padding: const EdgeInsets.symmetric(vertical: 12.0),
+        header: const Text('Form Example Section'),
         children: [
           FastTextField(
             id: 'text_field',
@@ -281,7 +317,7 @@ class FormPage extends StatelessWidget {
           FastSegmentedControl(
             id: 'segmented_control',
             label: 'Class',
-            children: {
+            children: const {
               'economy': Text('Economy'),
               'business': Text('Business'),
               'first': Text('First'),
@@ -293,8 +329,8 @@ class FormPage extends StatelessWidget {
             max: 10,
             prefixBuilder: (state) {
               return CupertinoButton(
-                padding: EdgeInsets.only(left: 0),
-                child: Icon(CupertinoIcons.volume_mute),
+                padding: const EdgeInsets.only(left: 0),
+                child: const Icon(CupertinoIcons.volume_mute),
                 onPressed: state.widget.enabled
                     ? () => state.didChange(state.widget.min)
                     : null,
@@ -303,19 +339,19 @@ class FormPage extends StatelessWidget {
             suffixBuilder: (state) {
               return CupertinoButton(
                 padding: EdgeInsets.zero,
-                child: Icon(CupertinoIcons.volume_up),
+                child: const Icon(CupertinoIcons.volume_up),
                 onPressed: state.widget.enabled
                     ? () => state.didChange(state.widget.max)
                     : null,
               );
             },
             helperBuilder: (FormFieldState<double> _state) {
-              return DefaultTextStyle(
-                style: const TextStyle(
+              return const DefaultTextStyle(
+                style: TextStyle(
                   color: CupertinoColors.black,
                 ),
                 child: Padding(
-                  padding: const EdgeInsetsDirectional.only(top: 6.0),
+                  padding: EdgeInsetsDirectional.only(top: 6.0),
                   child: Text('This is a help text'),
                 ),
               );

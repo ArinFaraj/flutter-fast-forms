@@ -9,22 +9,22 @@ typedef HelperBuilder<T> = Widget? Function(FastFormFieldState<T> state);
 @immutable
 abstract class FastFormField<T> extends FormField<T> {
   const FastFormField({
-    this.adaptive,
-    this.autofocus = false,
     AutovalidateMode autovalidateMode = AutovalidateMode.onUserInteraction,
-    required FormFieldBuilder<T> builder,
-    this.contentPadding,
-    this.decoration,
     bool enabled = true,
-    this.helperText,
-    required this.id,
+    required FormFieldBuilder<T> builder,
     T? initialValue,
     Key? key,
+    FormFieldSetter<T>? onSaved,
+    FormFieldValidator<T>? validator,
+    this.adaptive,
+    this.autofocus = false,
+    this.contentPadding,
+    this.decoration,
+    this.helperText,
+    required this.id,
     this.label,
     this.onChanged,
     this.onReset,
-    FormFieldSetter<T>? onSaved,
-    FormFieldValidator<T>? validator,
   }) : super(
           autovalidateMode: autovalidateMode,
           builder: builder,
@@ -52,13 +52,14 @@ class FastFormFieldState<T> extends FormFieldState<T> {
 
   late FocusNode focusNode;
 
+  FastFormScope? formScope;
+
   @override
   FastFormField<T> get widget => super.widget as FastFormField<T>;
 
-  bool get adaptive =>
-      widget.adaptive ?? FastFormScope.of(context)?.adaptive ?? false;
+  bool get adaptive => widget.adaptive ?? formScope?.adaptive ?? false;
 
-  FastFormState? get formState => FastFormScope.of(context)?.formState;
+  FastFormState? get formState => formScope?.formState;
 
   @override
   void initState() {
@@ -82,6 +83,7 @@ class FastFormFieldState<T> extends FormFieldState<T> {
 
   @override
   Widget build(BuildContext context) {
+    formScope = FastFormScope.of(context);
     formState?.register(this);
     return super.build(context);
   }
@@ -125,13 +127,12 @@ class FastFormFieldState<T> extends FormFieldState<T> {
   }
 }
 
-final ErrorBuilder<dynamic> errorBuilder = (FastFormFieldState<dynamic> state) {
+Text? errorBuilder(FastFormFieldState<dynamic> state) {
   return state.errorText is String ? Text(state.errorText!) : null;
-};
+}
 
-final HelperBuilder<dynamic> helperBuilder =
-    (FastFormFieldState<dynamic> state) {
+Text? helperBuilder(FastFormFieldState<dynamic> state) {
   return state.widget.helperText is String
       ? Text(state.widget.helperText!)
       : null;
-};
+}

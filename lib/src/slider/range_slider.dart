@@ -16,22 +16,22 @@ class FastRangeSlider extends FastFormField<RangeValues> {
     FormFieldBuilder<RangeValues>? builder,
     EdgeInsetsGeometry? contentPadding,
     InputDecoration? decoration,
-    this.divisions,
     bool enabled = true,
     String? helperText,
     required String id,
     RangeValues? initialValue,
     Key? key,
     String? label,
+    ValueChanged<RangeValues>? onChanged,
+    VoidCallback? onReset,
+    FormFieldSetter<RangeValues>? onSaved,
+    FormFieldValidator<RangeValues>? validator,
+    this.divisions,
     this.labelsBuilder,
     this.max = 1.0,
     this.min = 0.0,
     this.prefixBuilder,
     this.suffixBuilder,
-    ValueChanged<RangeValues>? onChanged,
-    VoidCallback? onReset,
-    FormFieldSetter<RangeValues>? onSaved,
-    FormFieldValidator<RangeValues>? validator,
   }) : super(
           autofocus: autofocus,
           autovalidateMode: autovalidateMode,
@@ -72,46 +72,42 @@ class FastRangeSliderState extends FastFormFieldState<RangeValues> {
   FastRangeSlider get widget => super.widget as FastRangeSlider;
 }
 
-final RangeSliderLabelsBuilder rangeSliderLabelsBuilder =
-    (FastRangeSliderState state) {
+RangeLabels rangeSliderLabelsBuilder(FastRangeSliderState state) {
   return RangeLabels(
     state.value!.start.toStringAsFixed(0),
     state.value!.end.toStringAsFixed(0),
   );
-};
+}
 
-final RangeSliderFixBuilder rangeSliderPrefixBuilder =
-    (FastRangeSliderState state) {
-  return Container(
+SizedBox rangeSliderPrefixBuilder(FastRangeSliderState state) {
+  return SizedBox(
     width: 48.0,
     child: Center(
       child: Text(
         state.value!.start.toStringAsFixed(0),
-        style: TextStyle(
+        style: const TextStyle(
           fontSize: 16.0,
         ),
       ),
     ),
   );
-};
+}
 
-final RangeSliderFixBuilder rangeSliderSuffixBuilder =
-    (FastRangeSliderState state) {
-  return Container(
+SizedBox rangeSliderSuffixBuilder(FastRangeSliderState state) {
+  return SizedBox(
     width: 48.0,
     child: Center(
       child: Text(
         state.value!.end.toStringAsFixed(0),
-        style: TextStyle(
+        style: const TextStyle(
           fontSize: 16.0,
         ),
       ),
     ),
   );
-};
+}
 
-final FormFieldBuilder<RangeValues> rangeSliderBuilder =
-    (FormFieldState<RangeValues> field) {
+InputDecorator rangeSliderBuilder(FormFieldState<RangeValues> field) {
   final state = field as FastRangeSliderState;
   final widget = state.widget;
   final theme = Theme.of(state.context);
@@ -144,4 +140,4 @@ final FormFieldBuilder<RangeValues> rangeSliderBuilder =
       ],
     ),
   );
-};
+}

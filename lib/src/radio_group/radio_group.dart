@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_fast_forms/flutter_fast_forms.dart';
 
 import '../form_field.dart';
 import '../form_scope.dart';
 
 @immutable
 class RadioOption<T> {
-  RadioOption({
+  const RadioOption({
     required this.title,
     required this.value,
   });
@@ -14,8 +15,11 @@ class RadioOption<T> {
   final String title;
 }
 
-typedef RadioOptionsBuilder = Widget Function(
-    List<RadioOption> options, FastRadioGroupState state);
+typedef RadioOptionBuilder<T> = Widget Function(
+    RadioOption<T> option, FastRadioGroupState<T> state);
+
+typedef RadioOptionsBuilder<T> = Widget Function(
+    List<RadioOption<T>> options, FastRadioGroupState<T> state);
 
 enum RadioGroupOrientation { horizontal, vertical }
 
@@ -33,13 +37,14 @@ class FastRadioGroup<T> extends FastFormField<T> {
     T? initialValue,
     Key? key,
     String? label,
-    required this.options,
-    this.orientation = RadioGroupOrientation.vertical,
     ValueChanged<T>? onChanged,
     VoidCallback? onReset,
+    FormFieldSetter<T>? onSaved,
+    FormFieldValidator<T>? validator,
+    this.orientation = RadioGroupOrientation.vertical,
+    required this.options,
+    this.optionBuilder,
     this.optionsBuilder,
-    FormFieldSetter? onSaved,
-    FormFieldValidator? validator,
   }) : super(
           autofocus: autofocus,
           autovalidateMode: autovalidateMode,
@@ -48,7 +53,7 @@ class FastRadioGroup<T> extends FastFormField<T> {
                 final scope = FastFormScope.of(field.context);
                 final builder =
                     scope?.builders[FastRadioGroup] ?? radioGroupBuilder;
-                return builder(field);
+                return builder<T>(field);
               },
           decoration: decoration,
           enabled: enabled,
@@ -64,7 +69,8 @@ class FastRadioGroup<T> extends FastFormField<T> {
         );
 
   final List<RadioOption<T>> options;
-  final RadioOptionsBuilder? optionsBuilder;
+  final RadioOptionBuilder<T>? optionBuilder;
+  final RadioOptionsBuilder<T>? optionsBuilder;
   final RadioGroupOrientation orientation;
 
   @override
@@ -76,24 +82,29 @@ class FastRadioGroupState<T> extends FastFormFieldState<T> {
   FastRadioGroup<T> get widget => super.widget as FastRadioGroup<T>;
 }
 
-final RadioOptionsBuilder radioOptionsBuilder =
-    (options, FastRadioGroupState state) {
+Widget radioOptionBuilder<T>(
+    RadioOption<T> option, FastRadioGroupState<T> state) {
   final vertical = state.widget.orientation == RadioGroupOrientation.vertical;
-  final tiles = options.map((option) {
-    final tile = RadioListTile(
-      groupValue: state.value,
-      onChanged: state.widget.enabled ? state.didChange : null,
-      title: Text(option.title),
-      value: option.value,
-    );
-    return vertical ? tile : Expanded(child: tile);
-  }).toList();
+  final tile = RadioListTile<T>(
+    groupValue: state.value,
+    onChanged: state.widget.enabled ? state.didChange : null,
+    title: Text(option.title),
+    value: option.value,
+  );
+  return vertical ? tile : Expanded(child: tile);
+}
+
+Flex radioOptionsBuilder<T>(
+    List<RadioOption<T>> options, FastRadioGroupState<T> state) {
+  final optionBuilder = state.widget.optionBuilder ?? radioOptionBuilder;
+  final vertical = state.widget.orientation == RadioGroupOrientation.vertical;
+  final tiles = options.map((option) => optionBuilder(option, state)).toList();
 
   return vertical ? Column(children: tiles) : Row(children: tiles);
-};
+}
 
-final FormFieldBuilder radioGroupBuilder = (FormFieldState field) {
-  final state = field as FastRadioGroupState;
+InputDecorator radioGroupBuilder<T>(FormFieldState field) {
+  final state = field as FastRadioGroupState<T>;
   final widget = state.widget;
 
   final theme = Theme.of(state.context);
@@ -103,13 +114,15 @@ final FormFieldBuilder radioGroupBuilder = (FormFieldState field) {
       const InputDecoration();
   final InputDecoration effectiveDecoration =
       _decoration.applyDefaults(theme.inputDecorationTheme);
-  final _optionsBuilder = widget.optionsBuilder ?? radioOptionsBuilder;
 
   return InputDecorator(
     decoration: effectiveDecoration.copyWith(
       contentPadding: widget.contentPadding,
       errorText: state.errorText,
     ),
-    child: _optionsBuilder(widget.options, state),
+    // Try to refactor when constructor tear-offs arrive -> https://github.com/dart-lang/language/blob/master/accepted/future-releases/constructor-tearoffs/feature-specification.md
+    child: widget.optionsBuilder != null
+        ? widget.optionsBuilder!(widget.options, state)
+        : radioOptionsBuilder<T>(widget.options, state),
   );
-};
+}
