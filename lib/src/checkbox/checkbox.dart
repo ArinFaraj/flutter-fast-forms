@@ -63,13 +63,18 @@ class FastCheckboxState extends FastFormFieldState<bool> {
 }
 
 final CheckboxTitleBuilder checkboxTitleBuilder = (FastCheckboxState state) {
-  return Text(
-    state.widget.title,
-    style: TextStyle(
-      fontSize: 14.0,
-      color: state.value! ? Colors.black : Colors.grey,
-    ),
-  );
+  return Builder(builder: (context) {
+    return Text(
+      state.widget.title,
+      style: TextStyle(
+        fontSize: 14.0,
+        color: state.value!
+            ? Theme.of(context).textTheme.bodyText1!.color
+            : Color.lerp(
+                Theme.of(context).textTheme.bodyText1!.color, Colors.grey, 0.5),
+      ),
+    );
+  });
 };
 
 final FormFieldBuilder<bool> checkboxBuilder = (FormFieldState<bool> field) {
@@ -89,14 +94,17 @@ final FormFieldBuilder<bool> checkboxBuilder = (FormFieldState<bool> field) {
     decoration: effectiveDecoration.copyWith(
       errorText: state.errorText,
     ),
-    child: CheckboxListTile(
-      autofocus: widget.autofocus,
-      contentPadding: widget.contentPadding,
-      onChanged: widget.enabled ? state.didChange : null,
-      selected: state.value ?? false,
-      title: widget.title is String ? _titleBuilder(state) : null,
-      tristate: widget.tristate,
-      value: state.value,
-    ),
+    child: Builder(builder: (context) {
+      return CheckboxListTile(
+        autofocus: widget.autofocus,
+        contentPadding: widget.contentPadding,
+        activeColor: Theme.of(context).colorScheme.secondary,
+        onChanged: widget.enabled ? state.didChange : null,
+        selected: state.value ?? false,
+        title: widget.title is String ? _titleBuilder(state) : null,
+        tristate: widget.tristate,
+        value: state.value,
+      );
+    }),
   );
 };

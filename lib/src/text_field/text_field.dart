@@ -42,6 +42,7 @@ class FastTextField extends FastFormField<String> {
     this.padding,
     this.placeholder,
     this.prefix,
+    this.autoSelect = false,
     this.readOnly = false,
     this.suffix,
     this.textAlign = TextAlign.start,
@@ -49,13 +50,15 @@ class FastTextField extends FastFormField<String> {
     this.textCapitalization = TextCapitalization.none,
     this.trailing,
     FormFieldValidator<String>? validator,
-  }) : super(
+  })  : controller = TextEditingController(text: initialValue),
+        super(
           adaptive: adaptive,
           autofocus: autofocus,
           autovalidateMode: autovalidateMode,
           builder: builder ??
               (field) {
                 final scope = FastFormScope.of(field.context);
+
                 final builder =
                     scope?.builders[FastTextField] ?? adaptiveTextFieldBuilder;
                 return builder(field);
@@ -73,13 +76,14 @@ class FastTextField extends FastFormField<String> {
           onSaved: onSaved,
           validator: validator,
         );
-
+  final TextEditingController controller;
   final bool autocorrect;
   final Iterable<String>? autofillHints;
   final InputCounterWidgetBuilder? buildCounter;
   final bool enableInteractiveSelection;
   final bool enableSuggestions;
   final bool expands;
+  final bool autoSelect;
   final FocusNode? focusNode;
   final List<TextInputFormatter>? inputFormatters;
   final TextInputType? keyboardType;
@@ -155,11 +159,15 @@ final FormFieldBuilder<String> textFieldBuilder =
   return TextFormField(
     autocorrect: widget.autocorrect,
     autofillHints: widget.autofillHints,
+
     autofocus: widget.autofocus,
     autovalidateMode: state.autovalidateMode,
     buildCounter: widget.buildCounter,
+    onTap: widget.autoSelect ? widget.controller.selectAll : null,
     decoration: effectiveDecoration,
-    initialValue: widget.initialValue,
+    controller: widget.controller,
+
+    //initialValue: widget.initialValue,
     enabled: widget.enabled,
     enableInteractiveSelection: widget.enableInteractiveSelection,
     enableSuggestions: widget.enableSuggestions,
@@ -235,3 +243,10 @@ final FormFieldBuilder<String> adaptiveTextFieldBuilder =
   }
   return textFieldBuilder(field);
 };
+
+extension TextEditingControllerExt on TextEditingController {
+  void selectAll() {
+    if (text.isEmpty) return;
+    selection = TextSelection(baseOffset: 0, extentOffset: text.length);
+  }
+}

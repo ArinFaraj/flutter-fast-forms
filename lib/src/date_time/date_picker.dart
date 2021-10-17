@@ -346,7 +346,8 @@ final FormFieldBuilder<DateTime> datePickerBuilder =
   };
 
   return InkWell(
-    onTap: widget.enabled ? () => show(DatePickerEntryMode.input) : null,
+    borderRadius: BorderRadius.circular(14),
+    onTap: widget.enabled ? () => show(widget.initialEntryMode) : null,
     child: InputDecorator(
       decoration: effectiveDecoration.copyWith(
         contentPadding: widget.contentPadding,

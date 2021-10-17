@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import '../../flutter_fast_forms.dart';
 import '../form_field.dart';
 import '../form_scope.dart';
+import 'package:path/path.dart' as path_helper;
 
 typedef MultiFilePickerTextBuilder = Text Function(
     FastMultiFilePickerState state);
@@ -31,6 +32,7 @@ class FastMultiFilePicker extends FastFormField<List<String>> {
     this.changeText,
     this.contentPadding,
     this.currentFile,
+    this.savedFolderPath,
     this.fileType = FileTypeCross.image,
     InputDecoration? decoration,
     bool enabled = true,
@@ -86,6 +88,7 @@ class FastMultiFilePicker extends FastFormField<List<String>> {
 
   final String? removeText;
   final String? changeText;
+  final String? savedFolderPath;
   final EdgeInsetsGeometry? contentPadding;
   final String? currentFile;
   final FileTypeCross fileType;
@@ -159,22 +162,24 @@ final FormFieldBuilder<List<String>> multifilePickerBuilder =
   final InputDecoration effectiveDecoration =
       decoration.applyDefaults(Theme.of(context).inputDecorationTheme);
 
-  final ShowMultiFilePicker show = (FileTypeCross type) {
-    FilePickerCross.importMultipleFromStorage(type: type).then((value) {
+  final ShowMultiFilePicker show = (FileTypeCross type) async {
+    try {
+      var value = await FilePickerCross.importMultipleFromStorage(type: type);
+
       var files = state.value!;
       files.addAll(value.map((e) => e.path!));
       state.didChange(files);
-    }).onError((dynamic error, _) {
-      String _exceptionData = error.reason();
+    } catch (e) {
+      String _exceptionData = (type as dynamic).reason();
       print('----------------------');
       print('REASON: $_exceptionData');
       if (_exceptionData == 'read_external_storage_denied') {
-        print('Permission was denied');
+        throw Exception('Permission was denied');
       } else if (_exceptionData == 'selection_canceled') {
         print('User canceled operation');
       }
       print('----------------------');
-    });
+    }
   };
   return InputDecorator(
     decoration: effectiveDecoration.copyWith(
@@ -193,6 +198,16 @@ final FormFieldBuilder<List<String>> multifilePickerBuilder =
               (index) {
                 var wid = 1.0;
 
+                File file = File(state.value![index]);
+                if (!file.existsSync()) {
+                  if (widget.savedFolderPath != null &&
+                      widget.savedFolderPath!.isNotEmpty) {
+                    file = File(path_helper.join(
+                        widget.savedFolderPath!, state.value![index]));
+                  }
+                }
+
+                final exist = file.existsSync();
                 return StatefulBuilder(builder: (context, setState) {
                   return Stack(
                     clipBehavior: Clip.none,
@@ -202,18 +217,33 @@ final FormFieldBuilder<List<String>> multifilePickerBuilder =
                         opacity: wid,
                         child: ClipRRect(
                           borderRadius: BorderRadius.all(Radius.circular(20)),
-                          child: InkWell(
-                            onTap: widget.usePreviewDialog
-                                ? () =>
-                                    openFileDialog(context, state.value![index])
-                                : null,
-                            child: ExtendedImage.file(
-                              File(state.value![index]),
-                              fit: BoxFit.cover,
-                              height: widget.height,
-                              width: widget.height,
-                            ),
-                          ),
+                          child: exist
+                              ? InkWell(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(20)),
+                                  onTap: widget.usePreviewDialog
+                                      ? () => openFileDialog(context, file)
+                                      : null,
+                                  child: ExtendedImage.file(
+                                    file,
+                                    fit: BoxFit.cover,
+                                    cacheWidth: widget.height.toInt(),
+                                    height: widget.height,
+                                    width: widget.height,
+                                  ),
+                                )
+                              : Center(
+                                  child: TextButton.icon(
+                                      onPressed: widget.enabled
+                                          ? () => show(FileTypeCross.image)
+                                          : null,
+                                      icon: Icon(
+                                        Icons.warning_rounded,
+                                        color: Colors.red,
+                                      ),
+                                      label:
+                                          Text('File Not Found\n${file.path}')),
+                                ),
                         ),
                       ),
                       Positioned(
@@ -241,13 +271,14 @@ final FormFieldBuilder<List<String>> multifilePickerBuilder =
               },
             ),
           InkWell(
+            borderRadius: BorderRadius.all(Radius.circular(20)),
             onTap: widget.enabled ? () => show(FileTypeCross.image) : null,
             child: Container(
               height: widget.height,
               width: widget.height,
               decoration: BoxDecoration(
                 border: Border.all(
-                  color: Theme.of(context).accentColor,
+                  color: Theme.of(context).colorScheme.secondary,
                 ),
                 //color:Colors.transparent,
                 borderRadius: BorderRadius.all(

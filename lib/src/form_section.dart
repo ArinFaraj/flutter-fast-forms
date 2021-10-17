@@ -53,6 +53,7 @@ class FastFormSection extends StatelessWidget {
 
   Widget _buildVerticalFormSection(BuildContext context) {
     return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
       children: <Widget>[
         if (header != null) header!,
         for (final child in children)
@@ -63,6 +64,7 @@ class FastFormSection extends StatelessWidget {
 
   Widget _buildHorizontalFormSection(BuildContext context) {
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         for (final child in children)
           Expanded(

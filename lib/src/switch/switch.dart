@@ -82,7 +82,8 @@ final FormFieldBuilder<bool> switchBuilder = (FormFieldState<bool> field) {
   final state = field as FastSwitchState;
   final widget = state.widget;
   final theme = Theme.of(state.context);
-
+  final bool isDark = theme.brightness == Brightness.dark;
+  const Color black32 = Color(0x52000000);
   final decorator = FastFormScope.of(state.context)?.inputDecorator;
   final _decoration = widget.decoration ??
       decorator?.call(state.context, state.widget) ??
@@ -95,14 +96,19 @@ final FormFieldBuilder<bool> switchBuilder = (FormFieldState<bool> field) {
     decoration: effectiveDecoration.copyWith(
       errorText: state.errorText,
     ),
-    child: SwitchListTile.adaptive(
-      autofocus: widget.autofocus,
-      contentPadding: widget.contentPadding,
-      onChanged: widget.enabled ? state.didChange : null,
-      selected: state.value!,
-      title: widget.title is String ? _titleBuilder(state) : null,
-      value: state.value!,
-    ),
+    child: Builder(builder: (context) {
+      return SwitchListTile(
+        autofocus: widget.autofocus,
+        contentPadding: widget.contentPadding,
+        activeColor: isDark ? Colors.grey.shade400 : Colors.grey.shade50,
+        activeTrackColor: isDark ? Colors.white30 : black32,
+        //activeColor: Theme.of(context).colorScheme.secondary,
+        onChanged: widget.enabled ? state.didChange : null,
+        selected: state.value!,
+        title: widget.title is String ? _titleBuilder(state) : null,
+        value: state.value!,
+      );
+    }),
   );
 };
 
