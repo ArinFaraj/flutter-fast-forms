@@ -166,16 +166,8 @@ Widget multifilePickerBuilder(FormFieldState<List<String>> field) {
       var files = state.value!;
       files.addAll(value.map((e) => e.path!));
       state.didChange(files);
-    } catch (e) {
-      String _exceptionData = (type as dynamic).reason();
-      log('----------------------');
-      log('REASON: $_exceptionData');
-      if (_exceptionData == 'read_external_storage_denied') {
-        throw Exception('Permission was denied');
-      } else if (_exceptionData == 'selection_canceled') {
-        log('User canceled operation');
-      }
-      log('----------------------');
+    } on FileSelectionCanceledError {
+      log('User canceled operation');
     }
   }
 

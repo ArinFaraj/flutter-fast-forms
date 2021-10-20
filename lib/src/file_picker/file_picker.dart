@@ -162,16 +162,8 @@ Widget filePickerBuilder(FormFieldState<String?> field) {
         type: type,
       );
       state.didChange(value.path);
-    } catch (e) {
-      String _exceptionData = (e as dynamic).reason();
-      log('----------------------');
-      log('REASON: $_exceptionData');
-      if (_exceptionData == 'read_external_storage_denied') {
-        throw Exception('Permission was denied');
-      } else if (_exceptionData == 'selection_canceled') {
-        log('User canceled operation');
-      }
-      log('----------------------');
+    } on FileSelectionCanceledError {
+      log('User canceled operation');
     }
   }
 
