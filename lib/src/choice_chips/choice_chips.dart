@@ -84,6 +84,14 @@ class FastChoiceChip
 
   @override
   bool get isEnabled => onSelected != null;
+
+  @override
+  // TODO: implement iconTheme
+  IconThemeData? get iconTheme => const IconThemeData();
+
+  @override
+  // TODO: implement surfaceTintColor
+  Color? get surfaceTintColor => const Color(0x12325465);
 }
 
 typedef ChoiceChipBuilder = Widget Function(
