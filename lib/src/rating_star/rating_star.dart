@@ -1,9 +1,8 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'star.dart';
 
 import '../form_field.dart';
 import '../form_scope.dart';
+import 'star.dart';
 
 typedef RatingStarFixBuilder = Widget Function(FastRatingStarState state);
 

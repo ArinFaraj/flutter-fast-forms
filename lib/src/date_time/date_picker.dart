@@ -159,7 +159,7 @@ Text datePickerTextBuilder(FastDatePickerState state) {
 
   return Text(
     value != null ? format(state.value!) : '',
-    style: theme.textTheme.subtitle1,
+    style: theme.textTheme.titleMedium,
     textAlign: TextAlign.left,
   );
 }

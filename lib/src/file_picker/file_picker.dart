@@ -1,20 +1,19 @@
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:extended_image/extended_image.dart';
-import 'package:file_picker_cross/file_picker_cross.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:path/path.dart' as path_helper;
+
 import '../form_field.dart';
 import '../form_scope.dart';
-import 'package:path/path.dart' as path_helper;
 
 typedef FilePickerTextBuilder = Text Function(FastFilePickerState state);
 
 typedef FilePickerModalPopupBuilder = Widget Function(
     BuildContext context, FastFilePickerState state);
 
-typedef ShowFilePicker = Function(FileTypeCross entryMode);
+typedef ShowFilePicker = Function(FileType entryMode);
 
 typedef FilePickerIconButtonBuilder = Widget Function(
     FastFilePickerState state, ShowFilePicker show);
@@ -31,7 +30,7 @@ class FastFilePicker extends FastFormField<String?> {
     EdgeInsetsGeometry? contentPadding,
     this.heroTag,
     this.currentFile,
-    this.fileType = FileTypeCross.image,
+    this.fileType = FileType.image,
     InputDecoration? decoration,
     bool enabled = true,
     this.errorBuilder,
@@ -88,7 +87,7 @@ class FastFilePicker extends FastFormField<String?> {
   final String? changeText;
   final String? savedFolderPath;
   final String? currentFile;
-  final FileTypeCross fileType;
+  final FileType fileType;
   final ErrorBuilder<String>? errorBuilder;
   final String? errorFormatText;
   final String? errorInvalidText;
@@ -156,15 +155,15 @@ Widget filePickerBuilder(FormFieldState<String?> field) {
   final InputDecoration effectiveDecoration =
       decoration.applyDefaults(Theme.of(context).inputDecorationTheme);
 
-  void show(FileTypeCross type) async {
-    try {
-      var value = await FilePickerCross.importFromStorage(
-        type: type,
-      );
-      state.didChange(value.path);
-    } on FileSelectionCanceledError {
-      log('User canceled operation');
+  void show(FileType type) async {
+    var value = await FilePicker.platform.pickFiles(
+      allowMultiple: false,
+      type: type,
+    );
+    if (value == null) {
+      return;
     }
+    state.didChange(value.files.single.path);
   }
 
   File? file;
@@ -194,8 +193,7 @@ Widget filePickerBuilder(FormFieldState<String?> field) {
                 if (state.value == null || state.value!.isEmpty)
                   InkWell(
                     borderRadius: const BorderRadius.all(Radius.circular(20)),
-                    onTap:
-                        widget.enabled ? () => show(FileTypeCross.image) : null,
+                    onTap: widget.enabled ? () => show(FileType.image) : null,
                     child: Container(
                       height: widget.height,
                       width: widget.height,
@@ -239,7 +237,7 @@ Widget filePickerBuilder(FormFieldState<String?> field) {
                       : Center(
                           child: TextButton.icon(
                               onPressed: widget.enabled
-                                  ? () => show(FileTypeCross.image)
+                                  ? () => show(FileType.image)
                                   : null,
                               icon: const Icon(
                                 Icons.warning_rounded,

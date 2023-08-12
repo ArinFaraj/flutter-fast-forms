@@ -10,12 +10,13 @@ dependencies:
   dropdown_search: ^1.0.3
 
   extended_image: ^8.0.2
-  file_picker_cross: ^4.5.0
+  # file_picker_cross: ^4.5.0
   flutter:
     sdk: flutter
   simple_star_rating: ^0.0.3
   flutter_staggered_animations: ^1.0.0
   intl: ^0.18.0
+  file_picker: ^5.3.3
 
 dev_dependencies:
   flutter_test:

@@ -3,11 +3,6 @@ import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:flutter_fast_forms/flutter_fast_forms.dart';
 
-import 'dropdown/dropdown.dart';
-import 'form_field.dart';
-import 'form_scope.dart';
-import 'text_field/text_field.dart';
-
 typedef FormChanged = void Function(
     UnmodifiableMapView<String, dynamic> values);
 
@@ -88,7 +83,7 @@ InputDecoration _inputDecorationCreator(
     helperText: field.helperText,
     hintText: field is FastTextField ? field.placeholder : null,
     labelStyle: TextStyle(
-      color: enabled ? theme.textTheme.bodyText1!.color : theme.disabledColor,
+      color: enabled ? theme.textTheme.bodyLarge!.color : theme.disabledColor,
     ),
     enabled: enabled,
     disabledBorder: OutlineInputBorder(

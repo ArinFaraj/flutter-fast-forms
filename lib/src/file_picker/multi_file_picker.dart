@@ -1,15 +1,12 @@
 import 'dart:async';
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:extended_image/extended_image.dart';
-import 'package:file_picker_cross/file_picker_cross.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import '../../flutter_fast_forms.dart';
-import '../form_field.dart';
-import '../form_scope.dart';
 import 'package:path/path.dart' as path_helper;
+
+import '../../flutter_fast_forms.dart';
 
 typedef MultiFilePickerTextBuilder = Text Function(
     FastMultiFilePickerState state);
@@ -17,7 +14,7 @@ typedef MultiFilePickerTextBuilder = Text Function(
 typedef MultiFilePickerModalPopupBuilder = Widget Function(
     BuildContext context, FastMultiFilePickerState state);
 
-typedef ShowMultiFilePicker = Function(FileTypeCross entryMode);
+typedef ShowMultiFilePicker = Function(FileType entryMode);
 
 typedef MultiFilePickerIconButtonBuilder = Widget Function(
     FastMultiFilePickerState state, ShowMultiFilePicker show);
@@ -34,7 +31,7 @@ class FastMultiFilePicker extends FastFormField<List<String>> {
     EdgeInsetsGeometry? contentPadding,
     this.currentFile,
     this.savedFolderPath,
-    this.fileType = FileTypeCross.image,
+    this.fileType = FileType.image,
     InputDecoration? decoration,
     bool enabled = true,
     this.errorBuilder,
@@ -90,7 +87,7 @@ class FastMultiFilePicker extends FastFormField<List<String>> {
   final String? changeText;
   final String? savedFolderPath;
   final String? currentFile;
-  final FileTypeCross fileType;
+  final FileType fileType;
   final ErrorBuilder<String>? errorBuilder;
   final String? errorFormatText;
   final String? errorInvalidText;
@@ -159,16 +156,15 @@ Widget multifilePickerBuilder(FormFieldState<List<String>> field) {
   final InputDecoration effectiveDecoration =
       decoration.applyDefaults(Theme.of(context).inputDecorationTheme);
 
-  void show(FileTypeCross type) async {
-    try {
-      var value = await FilePickerCross.importMultipleFromStorage(type: type);
-
-      var files = state.value!;
-      files.addAll(value.map((e) => e.path!));
-      state.didChange(files);
-    } on FileSelectionCanceledError {
-      log('User canceled operation');
+  void show(FileType type) async {
+    var value =
+        await FilePicker.platform.pickFiles(type: type, allowMultiple: true);
+    if (value == null) {
+      return;
     }
+    var files = state.value!;
+    files.addAll(value.files.map((e) => e.path!));
+    state.didChange(files);
   }
 
   return InputDecorator(
@@ -226,7 +222,7 @@ Widget multifilePickerBuilder(FormFieldState<List<String>> field) {
                               : Center(
                                   child: TextButton.icon(
                                       onPressed: widget.enabled
-                                          ? () => show(FileTypeCross.image)
+                                          ? () => show(FileType.image)
                                           : null,
                                       icon: const Icon(
                                         Icons.warning_rounded,
@@ -264,7 +260,7 @@ Widget multifilePickerBuilder(FormFieldState<List<String>> field) {
             ),
           InkWell(
             borderRadius: const BorderRadius.all(Radius.circular(20)),
-            onTap: widget.enabled ? () => show(FileTypeCross.image) : null,
+            onTap: widget.enabled ? () => show(FileType.image) : null,
             child: Container(
               height: widget.height,
               width: widget.height,

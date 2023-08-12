@@ -70,9 +70,9 @@ final CheckboxTitleBuilder checkboxTitleBuilder = (FastCheckboxState state) {
       style: TextStyle(
         fontSize: 14.0,
         color: state.value!
-            ? Theme.of(context).textTheme.bodyText1!.color
+            ? Theme.of(context).textTheme.bodyLarge!.color
             : Color.lerp(
-                Theme.of(context).textTheme.bodyText1!.color, Colors.grey, 0.5),
+                Theme.of(context).textTheme.bodyLarge!.color, Colors.grey, 0.5),
       ),
     );
   });
@@ -102,7 +102,7 @@ InputDecorator checkboxBuilder(FormFieldState<bool> field) {
         activeColor: Theme.of(context).colorScheme.secondary,
         onChanged: widget.enabled ? state.didChange : null,
         selected: state.value ?? false,
-        title: widget.title is String ? _titleBuilder(state) : null,
+        title: _titleBuilder(state),
         tristate: widget.tristate,
         value: state.value,
       );
