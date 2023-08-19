@@ -92,6 +92,9 @@ class FastChoiceChip
   @override
   // TODO: implement surfaceTintColor
   Color? get surfaceTintColor => const Color(0x12325465);
+
+  @override
+  MaterialStateProperty<Color?>? get color => null;
 }
 
 typedef ChoiceChipBuilder = Widget Function(
