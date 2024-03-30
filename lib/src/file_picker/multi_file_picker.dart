@@ -6,7 +6,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart' as path_helper;
 
-import '../../flutter_fast_forms.dart';
+import 'package:flutter_fast_forms/flutter_fast_forms.dart';
 
 typedef MultiFilePickerTextBuilder = Text Function(
     FastMultiFilePickerState state);
@@ -124,21 +124,21 @@ Widget multifilePickerIconButtonBuilder(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         OutlinedButton(
+          onPressed: widget.enabled ? () => show(widget.fileType) : null,
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Text(widget.changeText ?? 'Change Image'),
           ),
-          onPressed: widget.enabled ? () => show(widget.fileType) : null,
         ),
         const SizedBox(
           height: 10,
         ),
         OutlinedButton(
+          onPressed: widget.enabled ? () => state.didChange(null) : null,
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Text(widget.removeText ?? 'Remove Image'),
           ),
-          onPressed: widget.enabled ? () => state.didChange(null) : null,
         ),
       ],
     ),
